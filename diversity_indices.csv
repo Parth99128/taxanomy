@@ -1,0 +1,6 @@
+Station,Depth_m,Habitat,Observed_OTUs,Shannon_H,Simpson_D,Chao1,Pielou_J,Total_reads
+STN_01_AbyssalPlain,3840,Abyssal Plain,48,3.7216,0.9,16.0,0.91,77477
+STN_02_SeamountFlank,1200,Seamount Flank,48,3.7183,0.9,16.0,0.91,77300
+STN_03_CanyonAxis,2650,Submarine Canyon,48,3.7162,0.9,16.0,0.91,78588
+STN_04_HydroVentField,3150,Hydrothermal Vent,48,3.7206,0.9,16.0,0.91,78112
+STN_05_AbyssalPlain2,4200,Abyssal Plain,48,3.7178,0.9,16.0,0.91,77482

@@ -1,0 +1,669 @@
+{
+    "pipeline_version": "DeepDNA v2.0-DL-Unsupervised",
+    "source_data": {
+        "reference": "Real 18S V4 sequences from SILVA 138.1 + published deep-sea studies",
+        "studies_used": [
+            "PRJNA742151 (Cold seep microbial eukaryotes, South China Sea)",
+            "PRJNA900714 (Yongle blue hole 18S, South China Sea)",
+            "Blanes Canyon COI/18S metabarcoding (900-1750m, Mediterranean)",
+            "ICoMM Arctic/Southern Ocean 18S V9 pyrotag (108,632 reads)"
+        ],
+        "marker_gene": "18S rRNA V4 region",
+        "sequencing": "Illumina MiSeq 2x300bp (simulated stations)"
+    },
+    "qc": {
+        "input_asvs": 48,
+        "passed": 48,
+        "rate": 100.0
+    },
+    "classification": {
+        "model": "RandomForest (k-mer features, DB-free)",
+        "cv_accuracy": 0.8639,
+        "total_asvs": 48,
+        "novel_asvs": 20,
+        "novel_pct": 41.7
+    },
+    "clustering": {
+        "n_clusters": 2,
+        "novel_clusters": 1,
+        "noise_points": 0
+    },
+    "diversity": {
+        "STN_01_AbyssalPlain": {
+            "habitat": "Abyssal Plain",
+            "depth_m": 3840,
+            "shannon_h": 3.7216,
+            "chao1": 16.0,
+            "pielou_j": 0.91
+        },
+        "STN_02_SeamountFlank": {
+            "habitat": "Seamount Flank",
+            "depth_m": 1200,
+            "shannon_h": 3.7183,
+            "chao1": 16.0,
+            "pielou_j": 0.91
+        },
+        "STN_03_CanyonAxis": {
+            "habitat": "Submarine Canyon",
+            "depth_m": 2650,
+            "shannon_h": 3.7162,
+            "chao1": 16.0,
+            "pielou_j": 0.91
+        },
+        "STN_04_HydroVentField": {
+            "habitat": "Hydrothermal Vent",
+            "depth_m": 3150,
+            "shannon_h": 3.7206,
+            "chao1": 16.0,
+            "pielou_j": 0.91
+        },
+        "STN_05_AbyssalPlain2": {
+            "habitat": "Abyssal Plain",
+            "depth_m": 4200,
+            "shannon_h": 3.7178,
+            "chao1": 16.0,
+            "pielou_j": 0.91
+        }
+    },
+    "taxonomy": {
+        "phyla_detected": 12,
+        "top_phyla": {
+            "Alveolata": 6.25,
+            "Foraminifera": 6.25,
+            "NOVEL/Unassigned": 41.67,
+            "Annelida": 4.17,
+            "Rhizaria": 4.17,
+            "Arthropoda": 6.25,
+            "Euglenozoa": 4.17,
+            "Echinodermata": 8.33,
+            "Xenacoelomorpha": 6.25,
+            "Kinorhyncha": 4.17,
+            "Stramenopiles": 4.17,
+            "Nematoda": 4.17
+        },
+        "novel_otu_count": 12,
+        "total_reads": 388959
+    },
+    "umap_data": [
+        {
+            "umap_x": 0.05309861362276448,
+            "umap_y": -0.020790175655787013,
+            "taxon": "ASV_Ammoni_001",
+            "phylum": "Alveolata",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": 0.05306048651150431,
+            "umap_y": -0.019522111516525935,
+            "taxon": "ASV_Ammoni_002",
+            "phylum": "Foraminifera",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": 0.04881702545078697,
+            "umap_y": -0.03693433721945958,
+            "taxon": "ASV_Ammoni_003",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": 0.04515990941215559,
+            "umap_y": -0.013412050214371116,
+            "taxon": "ASV_Sabati_001",
+            "phylum": "Annelida",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": 0.04731295775384241,
+            "umap_y": -0.013587145199914802,
+            "taxon": "ASV_Sabati_002",
+            "phylum": "Rhizaria",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": 0.04404873715720929,
+            "umap_y": -0.014825228425904105,
+            "taxon": "ASV_Sabati_003",
+            "phylum": "Arthropoda",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": 0.05392588228506747,
+            "umap_y": -0.0011244041308586595,
+            "taxon": "ASV_Capite_001",
+            "phylum": "Euglenozoa",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": 0.053832240262900365,
+            "umap_y": -0.010869648733663917,
+            "taxon": "ASV_Capite_002",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": 0.05344573051622183,
+            "umap_y": 0.006252355164300405,
+            "taxon": "ASV_Capite_003",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": 0.04041980676159757,
+            "umap_y": 0.0032118628865154602,
+            "taxon": "ASV_Symbio_001",
+            "phylum": "Echinodermata",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": 0.0550879834606135,
+            "umap_y": 0.009607503034344479,
+            "taxon": "ASV_Symbio_002",
+            "phylum": "Xenacoelomorpha",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": 0.06218113658431119,
+            "umap_y": 0.00937216024197237,
+            "taxon": "ASV_Symbio_003",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": -0.05709821330854959,
+            "umap_y": -0.011796510192480226,
+            "taxon": "ASV_Cryoth_001",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": -0.06002686809014859,
+            "umap_y": 0.017535233062267806,
+            "taxon": "ASV_Cryoth_002",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": -0.06334989284000184,
+            "umap_y": -0.02342632885234378,
+            "taxon": "ASV_Cryoth_003",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": 0.05375392373936845,
+            "umap_y": 0.014938678707474576,
+            "taxon": "ASV_Diplon_001",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": 0.047000315284024693,
+            "umap_y": 0.015921508162480637,
+            "taxon": "ASV_Diplon_002",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": 0.06041820451019852,
+            "umap_y": 0.01103740057673916,
+            "taxon": "ASV_Diplon_003",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": 0.05507664732812984,
+            "umap_y": 0.010058326067165462,
+            "taxon": "ASV_Stromb_001",
+            "phylum": "Kinorhyncha",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": 0.05507664380106561,
+            "umap_y": 0.01005832934773359,
+            "taxon": "ASV_Stromb_002",
+            "phylum": "Stramenopiles",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": 0.04758988974889604,
+            "umap_y": 0.01575023887120153,
+            "taxon": "ASV_Stromb_003",
+            "phylum": "Echinodermata",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": 0.05020755078249415,
+            "umap_y": 0.0030705551930282674,
+            "taxon": "ASV_Echino_001",
+            "phylum": "Xenacoelomorpha",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": 0.04891733717174569,
+            "umap_y": 0.0035322042109376148,
+            "taxon": "ASV_Echino_002",
+            "phylum": "Alveolata",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": 0.04170616048185359,
+            "umap_y": -0.00830701330040862,
+            "taxon": "ASV_Echino_003",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": 0.05037087864598788,
+            "umap_y": -0.007010655347295087,
+            "taxon": "ASV_Calanu_001",
+            "phylum": "Nematoda",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": 0.04807889777351742,
+            "umap_y": -0.0036403214873069155,
+            "taxon": "ASV_Calanu_002",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": 0.03760556775248757,
+            "umap_y": 0.00412477969273915,
+            "taxon": "ASV_Calanu_003",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": 0.040825709897352916,
+            "umap_y": 0.0038721767428256553,
+            "taxon": "ASV_Thalas_001",
+            "phylum": "Arthropoda",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": 0.022675340806761594,
+            "umap_y": 0.009523557337664933,
+            "taxon": "ASV_Thalas_002",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": 0.055924576550424564,
+            "umap_y": 0.016003160253003402,
+            "taxon": "ASV_Thalas_003",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": -0.05677802895990585,
+            "umap_y": 0.009808737225921538,
+            "taxon": "ASV_NOVELE_001",
+            "phylum": "Stramenopiles",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": -0.06313977583743555,
+            "umap_y": 0.014191231195428715,
+            "taxon": "ASV_NOVELE_002",
+            "phylum": "Echinodermata",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": -0.06377894095779936,
+            "umap_y": 0.014053661967153078,
+            "taxon": "ASV_NOVELE_003",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": -0.055349269245498094,
+            "umap_y": 0.007643782172291934,
+            "taxon": "ASV_NOVELE_001",
+            "phylum": "Alveolata",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": -0.06492146069009083,
+            "umap_y": 0.01149125168688994,
+            "taxon": "ASV_NOVELE_002",
+            "phylum": "Foraminifera",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": -0.05814824529945697,
+            "umap_y": 0.017151958384729743,
+            "taxon": "ASV_NOVELE_003",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": -0.05911240831253684,
+            "umap_y": 0.010366541738829373,
+            "taxon": "ASV_NOVELE_001",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": -0.06308791054343668,
+            "umap_y": 0.006724702190647941,
+            "taxon": "ASV_NOVELE_002",
+            "phylum": "Rhizaria",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": -0.06586067378638166,
+            "umap_y": 0.004759082413959323,
+            "taxon": "ASV_NOVELE_003",
+            "phylum": "Arthropoda",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": -0.06741335470417643,
+            "umap_y": -0.00021071808968652135,
+            "taxon": "ASV_Xenotu_001",
+            "phylum": "Euglenozoa",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": -0.067413353601807,
+            "umap_y": -0.00021071449904947113,
+            "taxon": "ASV_Xenotu_002",
+            "phylum": "Kinorhyncha",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": -0.0719886904064907,
+            "umap_y": 0.010065387171456849,
+            "taxon": "ASV_Xenotu_003",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": -0.06328826096057077,
+            "umap_y": -0.02039673383927971,
+            "taxon": "ASV_Holoth_001",
+            "phylum": "Echinodermata",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": -0.06015873510312861,
+            "umap_y": -0.011660304867766251,
+            "taxon": "ASV_Holoth_002",
+            "phylum": "Xenacoelomorpha",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": -0.060727611578454854,
+            "umap_y": -0.0193577855387474,
+            "taxon": "ASV_Holoth_003",
+            "phylum": "NOVEL/Unassigned",
+            "is_novel": true,
+            "confidence": 0.6
+        },
+        {
+            "umap_x": -0.06685404679673734,
+            "umap_y": -0.009532255588701504,
+            "taxon": "ASV_Monosi_001",
+            "phylum": "Foraminifera",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": -0.06762773923469301,
+            "umap_y": -0.010591710914742102,
+            "taxon": "ASV_Monosi_002",
+            "phylum": "Nematoda",
+            "is_novel": false,
+            "confidence": 0.85
+        },
+        {
+            "umap_x": -0.06949467379598302,
+            "umap_y": -0.012920212085410243,
+            "taxon": "ASV_Monosi_003",
+            "phylum": "Annelida",
+            "is_novel": false,
+            "confidence": 0.85
+        }
+    ],
+    "bray_curtis": {
+        "STN_01_AbyssalPlain": {
+            "STN_01_AbyssalPlain": 0.0,
+            "STN_02_SeamountFlank": 0.2047,
+            "STN_03_CanyonAxis": 0.1757,
+            "STN_04_HydroVentField": 0.3064,
+            "STN_05_AbyssalPlain2": 0.005
+        },
+        "STN_02_SeamountFlank": {
+            "STN_01_AbyssalPlain": 0.2047,
+            "STN_02_SeamountFlank": 0.0,
+            "STN_03_CanyonAxis": 0.235,
+            "STN_04_HydroVentField": 0.2666,
+            "STN_05_AbyssalPlain2": 0.2056
+        },
+        "STN_03_CanyonAxis": {
+            "STN_01_AbyssalPlain": 0.1757,
+            "STN_02_SeamountFlank": 0.235,
+            "STN_03_CanyonAxis": 0.0,
+            "STN_04_HydroVentField": 0.3936,
+            "STN_05_AbyssalPlain2": 0.1752
+        },
+        "STN_04_HydroVentField": {
+            "STN_01_AbyssalPlain": 0.3064,
+            "STN_02_SeamountFlank": 0.2666,
+            "STN_03_CanyonAxis": 0.3936,
+            "STN_04_HydroVentField": 0.0,
+            "STN_05_AbyssalPlain2": 0.3053
+        },
+        "STN_05_AbyssalPlain2": {
+            "STN_01_AbyssalPlain": 0.005,
+            "STN_02_SeamountFlank": 0.2056,
+            "STN_03_CanyonAxis": 0.1752,
+            "STN_04_HydroVentField": 0.3053,
+            "STN_05_AbyssalPlain2": 0.0
+        }
+    },
+    "phylum_per_station": {
+        "STN_01_AbyssalPlain": {
+            "Alveolata": 3.92,
+            "Foraminifera": 1.27,
+            "NOVEL/Unassigned": 6.58,
+            "Annelida": 0.49,
+            "Rhizaria": 0.41,
+            "Arthropoda": 6.7,
+            "Euglenozoa": 51.94,
+            "Echinodermata": 6.14,
+            "Xenacoelomorpha": 16.46,
+            "Kinorhyncha": 0.68,
+            "Stramenopiles": 1.74,
+            "Nematoda": 3.66
+        },
+        "STN_02_SeamountFlank": {
+            "Alveolata": 1.94,
+            "Foraminifera": 2.98,
+            "NOVEL/Unassigned": 7.37,
+            "Annelida": 3.1,
+            "Rhizaria": 17.5,
+            "Arthropoda": 9.46,
+            "Euglenozoa": 4.92,
+            "Echinodermata": 14.44,
+            "Xenacoelomorpha": 1.18,
+            "Kinorhyncha": 11.41,
+            "Stramenopiles": 17.86,
+            "Nematoda": 7.85
+        },
+        "STN_03_CanyonAxis": {
+            "Alveolata": 14.48,
+            "Foraminifera": 1.99,
+            "NOVEL/Unassigned": 1.58,
+            "Annelida": 8.61,
+            "Rhizaria": 26.67,
+            "Arthropoda": 6.25,
+            "Euglenozoa": 7.15,
+            "Echinodermata": 2.15,
+            "Xenacoelomorpha": 3.81,
+            "Kinorhyncha": 13.15,
+            "Stramenopiles": 1.98,
+            "Nematoda": 12.18
+        },
+        "STN_04_HydroVentField": {
+            "Alveolata": 1.57,
+            "Foraminifera": 14.22,
+            "NOVEL/Unassigned": 0.08,
+            "Annelida": 4.06,
+            "Rhizaria": 7.93,
+            "Arthropoda": 14.54,
+            "Euglenozoa": 5.25,
+            "Echinodermata": 3.57,
+            "Xenacoelomorpha": 24.51,
+            "Kinorhyncha": 16.93,
+            "Stramenopiles": 4.32,
+            "Nematoda": 3.04
+        },
+        "STN_05_AbyssalPlain2": {
+            "Alveolata": 2.53,
+            "Foraminifera": 11.82,
+            "NOVEL/Unassigned": 8.23,
+            "Annelida": 4.15,
+            "Rhizaria": 8.35,
+            "Arthropoda": 9.9,
+            "Euglenozoa": 10.93,
+            "Echinodermata": 2.53,
+            "Xenacoelomorpha": 14.76,
+            "Kinorhyncha": 17.37,
+            "Stramenopiles": 2.69,
+            "Nematoda": 6.73
+        }
+    },
+    "objective": "MoES CMLRE Novel Deep-Sea Taxa Discovery",
+    "unsupervised_results": {
+        "total_seqs": 48,
+        "latent_dimension": 32,
+        "number_of_groups": 12,
+        "novel_divergent_count": 20
+    },
+    "abundance_metrics": [
+        {
+            "Taxa_Cluster_ID": -1,
+            "Abundance_Count": 20,
+            "Relative_Abundance_Pct": "41.7%",
+            "Classification": "Novel/Undiscovered Taxa"
+        },
+        {
+            "Taxa_Cluster_ID": 1,
+            "Abundance_Count": 4,
+            "Relative_Abundance_Pct": "8.3%",
+            "Classification": "Expected Taxa Group 1"
+        },
+        {
+            "Taxa_Cluster_ID": 8,
+            "Abundance_Count": 3,
+            "Relative_Abundance_Pct": "6.2%",
+            "Classification": "Expected Taxa Group 8"
+        },
+        {
+            "Taxa_Cluster_ID": 4,
+            "Abundance_Count": 3,
+            "Relative_Abundance_Pct": "6.2%",
+            "Classification": "Expected Taxa Group 4"
+        },
+        {
+            "Taxa_Cluster_ID": 9,
+            "Abundance_Count": 2,
+            "Relative_Abundance_Pct": "4.2%",
+            "Classification": "Expected Taxa Group 9"
+        },
+        {
+            "Taxa_Cluster_ID": 10,
+            "Abundance_Count": 2,
+            "Relative_Abundance_Pct": "4.2%",
+            "Classification": "Expected Taxa Group 10"
+        },
+        {
+            "Taxa_Cluster_ID": 0,
+            "Abundance_Count": 2,
+            "Relative_Abundance_Pct": "4.2%",
+            "Classification": "Expected Taxa Group 0"
+        },
+        {
+            "Taxa_Cluster_ID": 11,
+            "Abundance_Count": 2,
+            "Relative_Abundance_Pct": "4.2%",
+            "Classification": "Expected Taxa Group 11"
+        },
+        {
+            "Taxa_Cluster_ID": 2,
+            "Abundance_Count": 2,
+            "Relative_Abundance_Pct": "4.2%",
+            "Classification": "Expected Taxa Group 2"
+        },
+        {
+            "Taxa_Cluster_ID": 7,
+            "Abundance_Count": 2,
+            "Relative_Abundance_Pct": "4.2%",
+            "Classification": "Expected Taxa Group 7"
+        },
+        {
+            "Taxa_Cluster_ID": 5,
+            "Abundance_Count": 2,
+            "Relative_Abundance_Pct": "4.2%",
+            "Classification": "Expected Taxa Group 5"
+        },
+        {
+            "Taxa_Cluster_ID": 6,
+            "Abundance_Count": 2,
+            "Relative_Abundance_Pct": "4.2%",
+            "Classification": "Expected Taxa Group 6"
+        },
+        {
+            "Taxa_Cluster_ID": 3,
+            "Abundance_Count": 2,
+            "Relative_Abundance_Pct": "4.2%",
+            "Classification": "Expected Taxa Group 3"
+        }
+    ]
+}

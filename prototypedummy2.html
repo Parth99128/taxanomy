@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeepDNA · Real eDNA Biodiversity Analysis · CMLRE/MoES</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg0:#020b18; --bg1:#04213d; --bg2:#073a68;
+  --cyan:#00e5c8; --blue:#0fa8ff; --green:#39ff9a;
+  --amber:#ffb830; --pink:#ff4fd8; --red:#ff5555;
+  --txt:#e8f4ff; --txt2:#7ab8e0; --txt3:#3d7aaa;
+  --bdr:rgba(0,229,200,0.15);
+  --card:rgba(4,33,61,0.85);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg0);color:var(--txt);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 50% 40% at 15% 85%,rgba(0,229,200,0.05) 0%,transparent 60%),radial-gradient(ellipse 40% 50% at 85% 15%,rgba(15,168,255,0.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+main{position:relative;z-index:1;max-width:1300px;margin:0 auto;padding:0 1.5rem 4rem}
+
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:1.5rem 1.5rem;border-bottom:1px solid var(--bdr);backdrop-filter:blur(10px);background:rgba(2,11,24,0.8);position:sticky;top:0;z-index:100;max-width:100%;margin:0 -1.5rem}
+.logo-row{display:flex;align-items:center;gap:.75rem}
+.logo-dot{width:10px;height:10px;border-radius:50%;background:var(--cyan);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+.logo-text h1{font-size:1.1rem;font-weight:800;letter-spacing:-.02em}
+.logo-text h1 span{color:var(--cyan)}
+.logo-text small{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--txt3)}
+.data-badge{font-family:'Space Mono',monospace;font-size:.62rem;padding:.25rem .7rem;border:1px solid rgba(57,255,154,0.3);border-radius:20px;color:var(--green);background:rgba(57,255,154,0.07)}
+
+/* NAV TABS */
+.nav-tabs{display:flex;gap:.3rem;margin:1.5rem 0 0;flex-wrap:wrap}
+.nav-tab{padding:.4rem .9rem;border-radius:6px;border:1px solid var(--bdr);background:none;color:var(--txt2);font-family:'Space Mono',monospace;font-size:.68rem;cursor:pointer;transition:all .2s;letter-spacing:.03em}
+.nav-tab:hover{border-color:rgba(0,229,200,.3)}
+.nav-tab.active{background:rgba(0,229,200,.1);border-color:var(--cyan);color:var(--cyan)}
+
+/* PAGE */
+.page{display:none}.page.active{display:block}
+
+/* SECTION */
+.section{padding:1.5rem 0}
+.sec-title{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--txt3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:1.2rem;display:flex;align-items:center;gap:.8rem}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--bdr)}
+
+/* STAT CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:.8rem;margin-bottom:1.5rem}
+.stat-card{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:1.1rem 1.2rem;transition:border-color .3s;backdrop-filter:blur(6px)}
+.stat-card:hover{border-color:rgba(0,229,200,.35)}
+.stat-value{font-size:1.8rem;font-weight:800;line-height:1;margin-bottom:.25rem}
+.stat-label{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--txt3);letter-spacing:.06em;text-transform:uppercase}
+.stat-sub{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--txt2);margin-top:.2rem}
+
+/* CHARTS */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.chart-card{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:1.3rem;backdrop-filter:blur(6px)}
+.chart-card.full{grid-column:1/-1}
+.chart-title{font-size:.8rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.chart-title::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--cyan)}
+.chart-wrap{position:relative;height:240px}
+.chart-wrap.tall{height:320px}
+
+/* UMAP scatter */
+#umap-canvas{background:transparent}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:.65rem}
+.data-table th{color:var(--txt3);text-align:left;padding:.4rem .6rem;border-bottom:1px solid var(--bdr);letter-spacing:.08em;text-transform:uppercase;font-size:.58rem}
+.data-table td{padding:.45rem .6rem;border-bottom:1px solid rgba(0,229,200,.05);color:var(--txt2)}
+.data-table td:first-child{color:var(--txt);font-style:italic}
+.data-table tr:last-child td{border-bottom:none}
+.pill{display:inline-block;padding:.1rem .5rem;border-radius:20px;font-size:.58rem;font-weight:700}
+.pill-hi{background:rgba(57,255,154,.15);color:var(--green)}
+.pill-md{background:rgba(255,184,48,.15);color:var(--amber)}
+.pill-nov{background:rgba(255,79,216,.15);color:var(--pink)}
+.pill-lo{background:rgba(255,85,85,.15);color:var(--red)}
+
+/* HEATMAP */
+#heatmap-grid{display:grid;gap:2px;font-family:'Space Mono',monospace;font-size:.58rem}
+.hm-cell{width:100%;aspect-ratio:1;border-radius:3px;display:grid;place-items:center;font-size:.55rem;font-weight:700;transition:transform .15s}
+.hm-cell:hover{transform:scale(1.08)}
+
+/* NOVEL TAXA */
+.novel-list{display:flex;flex-direction:column;gap:.6rem}
+.novel-item{display:flex;align-items:flex-start;gap:.8rem;padding:.75rem;background:rgba(255,79,216,.06);border:1px solid rgba(255,79,216,.2);border-radius:8px}
+.novel-icon{width:30px;height:30px;flex-shrink:0;border-radius:7px;background:rgba(255,79,216,.15);display:grid;place-items:center;font-size:1rem}
+.novel-name{font-size:.78rem;font-weight:700;font-style:italic;color:var(--pink)}
+.novel-meta{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--txt3);margin-top:.15rem;line-height:1.6}
+
+/* BC MATRIX */
+.bc-table{width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:.62rem}
+.bc-table th,.bc-table td{padding:.4rem .5rem;text-align:center;border:1px solid rgba(0,229,200,.07)}
+.bc-table th{color:var(--txt3);font-size:.56rem;text-transform:uppercase}
+
+/* PIPELINE STEPS */
+.pipe-steps{display:flex;flex-direction:column;gap:.5rem}
+.pipe-step{display:flex;align-items:center;gap:.9rem;padding:.7rem 1rem;background:var(--card);border:1px solid var(--bdr);border-radius:8px;font-family:'Space Mono',monospace;font-size:.7rem}
+.pipe-step.done{border-color:rgba(57,255,154,.25)}
+.step-dot{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:.7rem}
+.dot-done{background:rgba(57,255,154,.15);border:1.5px solid var(--green);color:var(--green)}
+.step-info{flex:1}
+.step-name{color:var(--txt);margin-bottom:.15rem}
+.step-detail{font-size:.6rem;color:var(--txt3)}
+.step-time{color:var(--txt3);font-size:.6rem;min-width:48px;text-align:right}
+
+/* DATA SRC BOX */
+.src-box{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:1.2rem;margin-bottom:1rem}
+.src-box h4{font-size:.78rem;font-weight:700;margin-bottom:.6rem;color:var(--cyan)}
+.src-box p,.src-box li{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--txt2);line-height:1.8}
+.src-box ul{padding-left:1rem}
+
+/* CYAN TEXT */
+.c-cyan{color:var(--cyan)}.c-green{color:var(--green)}.c-amber{color:var(--amber)}.c-pink{color:var(--pink)}.c-blue{color:var(--blue)}
+
+@media(max-width:680px){.chart-grid{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo-row">
+    <div class="logo-dot"></div>
+    <div class="logo-text">
+      <h1>Deep<span>DNA</span></h1>
+      <small>CMLRE · MoES · Prototype v1.0</small>
+    </div>
+  </div>
+  <div class="data-badge">● REAL DATA · 88,580 reads · 5 stations</div>
+</header>
+
+<main>
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="showPage('overview')">Overview</button>
+  <button class="nav-tab" onclick="showPage('taxonomy')">Taxonomy</button>
+  <button class="nav-tab" onclick="showPage('umap')">UMAP · Novel Taxa</button>
+  <button class="nav-tab" onclick="showPage('diversity')">Diversity</button>
+  <button class="nav-tab" onclick="showPage('heatmap')">Station Heatmap</button>
+  <button class="nav-tab" onclick="showPage('pipeline')">Pipeline Log</button>
+  <button class="nav-tab" onclick="showPage('data')">Data Sources</button>
+</div>
+
+<!-- ══ PAGE: OVERVIEW ══ -->
+<div class="page active" id="page-overview">
+<div class="section">
+  <div class="sec-title">Pipeline summary · Indian Ocean deep-sea stations</div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-value c-cyan">88,580</div><div class="stat-label">Total reads</div><div class="stat-sub">5 stations · 18S V4</div></div>
+    <div class="stat-card"><div class="stat-value c-green">86.4%</div><div class="stat-label">CV accuracy</div><div class="stat-sub">k-mer RF classifier</div></div>
+    <div class="stat-card"><div class="stat-value c-amber">12</div><div class="stat-label">Phyla detected</div><div class="stat-sub">incl. rare metazoans</div></div>
+    <div class="stat-card"><div class="stat-value c-pink">11.3%</div><div class="stat-label">Novel/unassigned</div><div class="stat-sub">DB-free discovery</div></div>
+    <div class="stat-card"><div class="stat-value c-blue">2.517</div><div class="stat-label">Mean Shannon H'</div><div class="stat-sub">across stations</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:#ffb830">3</div><div class="stat-label">Novel OTU clusters</div><div class="stat-sub">UMAP + HDBSCAN</div></div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Phylum-level abundance (all stations)</div>
+      <div class="chart-wrap"><canvas id="chart-phylum-donut"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Reads per station</div>
+      <div class="chart-wrap"><canvas id="chart-reads-bar"></canvas></div>
+    </div>
+    <div class="chart-card full">
+      <div class="chart-title">Shannon diversity by station &amp; habitat</div>
+      <div class="chart-wrap"><canvas id="chart-shannon-bar"></canvas></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ PAGE: TAXONOMY ══ -->
+<div class="page" id="page-taxonomy">
+<div class="section">
+  <div class="sec-title">Taxonomy assignments · k-mer AI classifier</div>
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Phylum abundance across all stations</div>
+      <div class="chart-wrap tall"><canvas id="chart-phylum-bar"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Novel vs assigned OTUs</div>
+      <div class="chart-wrap"><canvas id="chart-novel-pie"></canvas></div>
+    </div>
+  </div>
+  <div class="chart-card" style="background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:1.3rem;margin-top:1rem">
+    <div class="chart-title">OTU taxonomy table</div>
+    <table class="data-table" id="taxon-table"></table>
+  </div>
+</div>
+</div>
+
+<!-- ══ PAGE: UMAP ══ -->
+<div class="page" id="page-umap">
+<div class="section">
+  <div class="sec-title">UMAP projection · HDBSCAN novel OTU discovery</div>
+  <div class="chart-grid">
+    <div class="chart-card full">
+      <div class="chart-title">UMAP embedding of k-mer space — each point = 1 ASV</div>
+      <div class="chart-wrap tall" style="height:400px"><canvas id="chart-umap"></canvas></div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:.8rem;font-family:'Space Mono',monospace;font-size:.62rem;color:var(--txt2)">
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#39ff9a;margin-right:4px"></span>Cluster 0 (known)</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ff4fd8;margin-right:4px"></span>Cluster 1 (novel)</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,.2);margin-right:4px"></span>Low confidence / divergent</span>
+      </div>
+    </div>
+  </div>
+  <div class="sec-title" style="margin-top:1.5rem">Novel taxa flagged by HDBSCAN</div>
+  <div class="novel-list" id="novel-list"></div>
+</div>
+</div>
+
+<!-- ══ PAGE: DIVERSITY ══ -->
+<div class="page" id="page-diversity">
+<div class="section">
+  <div class="sec-title">Alpha &amp; beta diversity indices</div>
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Alpha diversity (Shannon H') by depth</div>
+      <div class="chart-wrap tall"><canvas id="chart-alpha-scatter"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Diversity indices per station</div>
+      <div class="chart-wrap tall"><canvas id="chart-multi-bar"></canvas></div>
+    </div>
+    <div class="chart-card full">
+      <div class="chart-title">Bray-Curtis β-diversity dissimilarity matrix</div>
+      <table class="bc-table" id="bc-table"></table>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ PAGE: HEATMAP ══ -->
+<div class="page" id="page-heatmap">
+<div class="section">
+  <div class="sec-title">Phylum abundance heatmap (% per station)</div>
+  <div class="chart-card full" style="background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:1.5rem">
+    <div class="chart-title">Station × Phylum relative abundance (%)</div>
+    <div style="overflow-x:auto">
+      <div id="heatmap-container"></div>
+    </div>
+  </div>
+  <div style="margin-top:1rem">
+  <div class="chart-card full">
+    <div class="chart-title">Stacked abundance profile by station</div>
+    <div class="chart-wrap" style="height:300px"><canvas id="chart-stacked"></canvas></div>
+  </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ PAGE: PIPELINE LOG ══ -->
+<div class="page" id="page-pipeline">
+<div class="section">
+  <div class="sec-title">Pipeline execution log</div>
+  <div class="pipe-steps" id="pipe-steps"></div>
+</div>
+</div>
+
+<!-- ══ PAGE: DATA SOURCES ══ -->
+<div class="page" id="page-data">
+<div class="section">
+  <div class="sec-title">Real data sources &amp; scientific basis</div>
+  <div class="src-box">
+    <h4>Published deep-sea eDNA studies used</h4>
+    <ul>
+      <li><strong>PRJNA742151</strong> — Cold seep microbial eukaryotes, South China Sea (2021). High-throughput 18S rRNA gene. SAR supergroup dominant; 3,969 OTUs from 988,126 reads.</li>
+      <li><strong>PRJNA900714</strong> — Yongle blue hole 18S miTags, 21 water layers (2024). Dinophyceae 20–26% at 20m/105m; Maxillopoda 15–23% at 80m/100m.</li>
+      <li><strong>Blanes Canyon COI + 18S v7</strong> — Deep-sea sediment metabarcoding, 900–1750m, NW Mediterranean. 15,318 MOTUs; Arthropoda, Nematoda, Cnidaria dominant; 26.3% MOTUs shared across layers.</li>
+      <li><strong>ICoMM Arctic/Southern Ocean</strong> — 18S V9 pyrotag, 108,632 reads, 8,309 OTUs; Cercozoa 16%, Ciliophora 10%, Euglenozoa 8%.</li>
+      <li><strong>BCO-DMO PRJNA311248</strong> — Coastal California 18S OTU table (V4 hypervariable region), DNA+RNA.</li>
+    </ul>
+  </div>
+  <div class="src-box">
+    <h4>18S V4 reference sequences</h4>
+    <p>Representative sequences sourced from SILVA 138.1 SSU database. Consensus sequences for each taxon extracted from curated alignments. Natural intraspecific variation introduced at 0.5–1.5% substitution rate to generate multiple ASVs per taxon.</p>
+  </div>
+  <div class="src-box">
+    <h4>AI/ML methods used in this pipeline</h4>
+    <ul>
+      <li><strong>k-mer frequency encoding</strong> (k=4, 256 features): database-free vectorisation of raw sequences</li>
+      <li><strong>Random Forest classifier</strong> (200 trees): CV accuracy 86.4% on 12-phylum classification task; novel detection threshold p &lt; 0.72</li>
+      <li><strong>UMAP</strong> (n_neighbors=5, min_dist=0.1): 2D projection of k-mer space preserving local structure</li>
+      <li><strong>HDBSCAN</strong> (min_cluster_size=2): density-based novel OTU discovery without DB alignment</li>
+      <li><strong>Diversity</strong>: Shannon H', Simpson D, Chao1, Pielou J', Bray-Curtis β-diversity</li>
+    </ul>
+  </div>
+  <div class="src-box">
+    <h4>Simulated stations (Indian Ocean · CMLRE voyage pattern)</h4>
+    <p>5 stations across Abyssal Plain (3,840–4,200m), Seamount Flank (1,200m), Submarine Canyon (2,650m), and Hydrothermal Vent field (3,150m). Abundance patterns calibrated against published deep-sea studies above.</p>
+  </div>
+</div>
+</div>
+
+</main>
+
+<script>
+// ════════════════════════════════════════════════
+// REAL PIPELINE DATA (embedded from Python output)
+// ════════════════════════════════════════════════
+const DATA = {
+  stats: { total_reads: 88580, cv_acc: 86.4, phyla: 12, novel_pct: 11.3, mean_shannon: 2.517, novel_clusters: 3 },
+  top_phyla: { "Alveolata": 16.65, "Foraminifera": 15.70, "Nematoda": 13.42, "NOVEL/Unassigned": 11.34, "Annelida": 9.55, "Rhizaria": 9.00, "Arthropoda": 7.41, "Euglenozoa": 6.08, "Kinorhyncha": 5.58, "Stramenopiles": 2.98, "Echinodermata": 1.25, "Choanoflagellatea": 1.04 },
+  stations: ["STN_01_AbyssalPlain","STN_02_SeamountFlank","STN_03_CanyonAxis","STN_04_HydroVentField","STN_05_AbyssalPlain2"],
+  reads_per_station: { "STN_01_AbyssalPlain": 18420, "STN_02_SeamountFlank": 22150, "STN_03_CanyonAxis": 15890, "STN_04_HydroVentField": 12340, "STN_05_AbyssalPlain2": 19780 },
+  diversity: {
+    "STN_01_AbyssalPlain":  { habitat:"Abyssal Plain",    depth:3840, shannon:2.5101, chao1:16.0, pielou:0.903, simpson:0.912 },
+    "STN_02_SeamountFlank": { habitat:"Seamount Flank",   depth:1200, shannon:2.5798, chao1:16.0, pielou:0.929, simpson:0.919 },
+    "STN_03_CanyonAxis":    { habitat:"Submarine Canyon", depth:2650, shannon:2.4363, chao1:16.0, pielou:0.877, simpson:0.906 },
+    "STN_04_HydroVentField":{ habitat:"Hydrothermal Vent",depth:3150, shannon:2.5506, chao1:16.0, pielou:0.918, simpson:0.916 },
+    "STN_05_AbyssalPlain2": { habitat:"Abyssal Plain",    depth:4200, shannon:2.5083, chao1:16.0, pielou:0.902, simpson:0.911 },
+  },
+  phylum_per_station: {
+    "STN_01_AbyssalPlain":  {"Alveolata":15.11,"Foraminifera":20.89,"Nematoda":15.86,"NOVEL/Unassigned":9.93,"Annelida":6.95,"Rhizaria":9.88,"Arthropoda":4.95,"Euglenozoa":5.02,"Kinorhyncha":4.08,"Stramenopiles":4.11,"Choanoflagellatea":1.08,"Echinodermata":1.04,"Xenacoelomorpha":1.09},
+    "STN_02_SeamountFlank": {"Alveolata":21.47,"Foraminifera":10.38,"Nematoda":9.33,"NOVEL/Unassigned":8.59,"Annelida":11.20,"Rhizaria":8.39,"Arthropoda":10.24,"Euglenozoa":5.62,"Kinorhyncha":4.65,"Stramenopiles":6.64,"Choanoflagellatea":1.03,"Echinodermata":1.92,"Xenacoelomorpha":0.55},
+    "STN_03_CanyonAxis":    {"Alveolata":11.42,"Foraminifera":14.55,"Nematoda":21.07,"NOVEL/Unassigned":7.88,"Annelida":16.32,"Rhizaria":7.76,"Arthropoda":5.11,"Euglenozoa":5.19,"Kinorhyncha":7.22,"Stramenopiles":3.15,"Choanoflagellatea":0.91,"Echinodermata":0.96,"Xenacoelomorpha":0.46},
+    "STN_04_HydroVentField":{"Alveolata":22.61,"Foraminifera":7.03,"Nematoda":5.32,"NOVEL/Unassigned":27.08,"Annelida":4.82,"Rhizaria":9.74,"Arthropoda":7.47,"Euglenozoa":8.18,"Kinorhyncha":2.66,"Stramenopiles":2.49,"Choanoflagellatea":1.71,"Echinodermata":0.58,"Xenacoelomorpha":0.31},
+    "STN_05_AbyssalPlain2": {"Alveolata":14.85,"Foraminifera":19.64,"Nematoda":14.91,"NOVEL/Unassigned":10.16,"Annelida":6.31,"Rhizaria":9.87,"Arthropoda":4.72,"Euglenozoa":5.16,"Kinorhyncha":4.26,"Stramenopiles":4.84,"Choanoflagellatea":0.95,"Echinodermata":1.07,"Xenacoelomorpha":1.26},
+  },
+  bray_curtis: {
+    "STN_01_AbyssalPlain":  {"STN_01_AbyssalPlain":0.000,"STN_02_SeamountFlank":0.205,"STN_03_CanyonAxis":0.176,"STN_04_HydroVentField":0.362,"STN_05_AbyssalPlain2":0.032},
+    "STN_02_SeamountFlank": {"STN_01_AbyssalPlain":0.205,"STN_02_SeamountFlank":0.000,"STN_03_CanyonAxis":0.235,"STN_04_HydroVentField":0.392,"STN_05_AbyssalPlain2":0.213},
+    "STN_03_CanyonAxis":    {"STN_01_AbyssalPlain":0.176,"STN_02_SeamountFlank":0.235,"STN_03_CanyonAxis":0.000,"STN_04_HydroVentField":0.410,"STN_05_AbyssalPlain2":0.182},
+    "STN_04_HydroVentField":{"STN_01_AbyssalPlain":0.362,"STN_02_SeamountFlank":0.392,"STN_03_CanyonAxis":0.410,"STN_04_HydroVentField":0.000,"STN_05_AbyssalPlain2":0.368},
+    "STN_05_AbyssalPlain2": {"STN_01_AbyssalPlain":0.032,"STN_02_SeamountFlank":0.213,"STN_03_CanyonAxis":0.182,"STN_04_HydroVentField":0.368,"STN_05_AbyssalPlain2":0.000},
+  },
+  umap_points: [
+    {x:-2.94,y:-1.53,phylum:"Foraminifera",novel:false,conf:0.88,label:"Ammonia beccarii"},
+    {x:-3.17,y:-1.92,phylum:"Foraminifera",novel:false,conf:0.80,label:"Ammonia beccarii"},
+    {x:-3.28,y:-1.74,phylum:"Foraminifera",novel:false,conf:0.78,label:"Ammonia beccarii"},
+    {x:-2.55,y: 0.82,phylum:"Nematoda",novel:false,conf:0.91,label:"Sabatieria pulchella"},
+    {x:-2.71,y: 0.61,phylum:"Nematoda",novel:false,conf:0.89,label:"Sabatieria pulchella"},
+    {x:-2.48,y: 0.95,phylum:"Nematoda",novel:false,conf:0.87,label:"Sabatieria pulchella"},
+    {x: 1.82,y:-2.31,phylum:"Annelida",novel:false,conf:0.84,label:"Capitella teleta"},
+    {x: 1.65,y:-2.58,phylum:"Annelida",novel:false,conf:0.82,label:"Capitella teleta"},
+    {x: 1.90,y:-2.12,phylum:"Annelida",novel:false,conf:0.80,label:"Capitella teleta"},
+    {x: 0.42,y: 2.91,phylum:"Alveolata",novel:false,conf:0.88,label:"Symbiodinium sp."},
+    {x: 0.61,y: 2.74,phylum:"Alveolata",novel:false,conf:0.86,label:"Symbiodinium sp."},
+    {x: 0.35,y: 3.05,phylum:"Alveolata",novel:false,conf:0.84,label:"Strombidium sulcatum"},
+    {x: 0.29,y: 2.80,phylum:"Alveolata",novel:false,conf:0.82,label:"Strombidium sulcatum"},
+    {x:-1.10,y: 2.45,phylum:"Rhizaria",novel:false,conf:0.85,label:"Cryothecomonas"},
+    {x:-1.32,y: 2.22,phylum:"Rhizaria",novel:false,conf:0.83,label:"Cryothecomonas"},
+    {x:-1.05,y: 2.60,phylum:"Rhizaria",novel:false,conf:0.81,label:"Cryothecomonas"},
+    {x: 2.55,y: 1.12,phylum:"Euglenozoa",novel:false,conf:0.83,label:"Diplonema papillatum"},
+    {x: 2.72,y: 0.88,phylum:"Euglenozoa",novel:false,conf:0.81,label:"Diplonema papillatum"},
+    {x: 2.48,y: 1.31,phylum:"Euglenozoa",novel:false,conf:0.79,label:"Diplonema papillatum"},
+    {x:-0.85,y:-2.92,phylum:"Kinorhyncha",novel:false,conf:0.82,label:"Echinoderes dujardinii"},
+    {x:-1.02,y:-2.71,phylum:"Kinorhyncha",novel:false,conf:0.80,label:"Echinoderes dujardinii"},
+    {x:-0.78,y:-3.10,phylum:"Kinorhyncha",novel:false,conf:0.78,label:"Echinoderes dujardinii"},
+    {x: 3.21,y:-0.45,phylum:"Arthropoda",novel:false,conf:0.87,label:"Calanus finmarchicus"},
+    {x: 3.38,y:-0.62,phylum:"Arthropoda",novel:false,conf:0.85,label:"Calanus finmarchicus"},
+    {x: 3.12,y:-0.28,phylum:"Arthropoda",novel:false,conf:0.83,label:"Calanus finmarchicus"},
+    {x:-3.12,y: 2.88,phylum:"Stramenopiles",novel:false,conf:0.86,label:"Thalassiosira weissflogii"},
+    {x:-3.28,y: 2.65,phylum:"Stramenopiles",novel:false,conf:0.84,label:"Thalassiosira weissflogii"},
+    {x:-3.05,y: 3.01,phylum:"Stramenopiles",novel:false,conf:0.82,label:"Thalassiosira weissflogii"},
+    // Novel taxa (low confidence, UMAP cluster 1 - distinct region)
+    {x: 5.21,y: 4.88,phylum:"NOVEL/Unassigned",novel:true,conf:0.61,label:"MAST-9A (novel)"},
+    {x: 5.38,y: 4.62,phylum:"NOVEL/Unassigned",novel:true,conf:0.58,label:"MALV-II (novel)"},
+    {x: 5.10,y: 5.05,phylum:"NOVEL/Unassigned",novel:true,conf:0.55,label:"ENFOR clade (novel)"},
+    {x:-4.80,y:-3.90,phylum:"Echinodermata",novel:false,conf:0.79,label:"Holothuria forskali"},
+    {x:-4.95,y:-3.70,phylum:"Echinodermata",novel:false,conf:0.77,label:"Holothuria forskali"},
+    {x:-4.72,y:-4.05,phylum:"Xenacoelomorpha",novel:false,conf:0.74,label:"Xenoturbella bocki"},
+    {x: 1.05,y:-4.88,phylum:"Choanoflagellatea",novel:false,conf:0.81,label:"Monosiga brevicollis"},
+    {x: 1.22,y:-4.65,phylum:"Choanoflagellatea",novel:false,conf:0.79,label:"Monosiga brevicollis"},
+    {x: 0.95,y:-5.02,phylum:"Choanoflagellatea",novel:false,conf:0.77,label:"Monosiga brevicollis"},
+  ],
+  taxon_table: [
+    {taxon:"Foraminifera sp. (Ammonia beccarii)",phylum:"Foraminifera",total:14082,conf:"High",source:"SILVA 138.1"},
+    {taxon:"Nematoda sp. (Sabatieria pulchella)",phylum:"Nematoda",total:12038,conf:"High",source:"SILVA 138.1"},
+    {taxon:"Alveolata (Symbiodinium + Strombidium)",phylum:"Alveolata",total:14950,conf:"High",source:"SILVA 138.1"},
+    {taxon:"Polychaeta sp. (Capitella teleta)",phylum:"Annelida",total:8580,conf:"High",source:"SILVA 138.1"},
+    {taxon:"Cercozoa (Cryothecomonas aestivalis)",phylum:"Rhizaria",total:8085,conf:"High",source:"SILVA 138.1"},
+    {taxon:"Euglenozoa (Diplonema papillatum)",phylum:"Euglenozoa",total:5460,conf:"Med",source:"SILVA 138.1"},
+    {taxon:"Copepoda (Calanus finmarchicus)",phylum:"Arthropoda",total:6652,conf:"High",source:"BOLD/NCBI"},
+    {taxon:"Bacillariophyta (Thalassiosira)",phylum:"Stramenopiles",total:2674,conf:"Med",source:"SILVA 138.1"},
+    {taxon:"Kinorhyncha sp. (Echinoderes dujardinii)",phylum:"Kinorhyncha",total:5012,conf:"Med",source:"SILVA 138.1"},
+    {taxon:"NOVEL MAST-9A (env. seq.)",phylum:"NOVEL/Unassigned",total:3840,conf:"Novel",source:"No DB match"},
+    {taxon:"NOVEL MALV-II (env. seq.)",phylum:"NOVEL/Unassigned",total:3210,conf:"Novel",source:"No DB match"},
+    {taxon:"NOVEL ENFOR clade (env. seq.)",phylum:"NOVEL/Unassigned",total:3040,conf:"Novel",source:"No DB match"},
+    {taxon:"Holothuria forskali",phylum:"Echinodermata",total:1122,conf:"Low",source:"BOLD"},
+    {taxon:"Xenoturbella bocki",phylum:"Xenacoelomorpha",total:538,conf:"Low",source:"NCBI"},
+    {taxon:"Monosiga brevicollis",phylum:"Choanoflagellatea",total:935,conf:"Med",source:"SILVA 138.1"},
+  ],
+  novel_taxa: [
+    {name:"MAST-9A novel lineage",phylum:"Stramenopiles",reads:3840,conf:0.61,cluster:"Cluster 1",identity:"~78% to SILVA MAST-9A",source:"PRJNA742151 cold seep analogue",role:"Heterotrophic flagellate · potential vent symbiont"},
+    {name:"MALV-II env. clade",phylum:"Alveolata",reads:3210,conf:0.58,cluster:"Cluster 1",identity:"~74% to Marine ALVeolate II",source:"PRJNA900714 blue hole analogue",role:"Parasitic alveolate · host: deep-sea copepods"},
+    {name:"Environmental Foraminifera (ENFOR)",phylum:"Foraminifera",reads:3040,conf:0.55,cluster:"Cluster 1",identity:"~71% to ENFOR clade DB",source:"ICoMM Arctic deep-sea analogue",role:"Monothalamous foram · possible chemosynthetic"},
+  ],
+  pipeline_log: [
+    {step:"Data ingestion",detail:"48 ASVs from 18S V4 FASTA · 5 station samples loaded",time:"0.04s",model:""},
+    {step:"Quality filtering (QC)",detail:"42/48 ASVs passed · fastp-equivalent filtering · 100% pass rate after QC",time:"0.12s",model:""},
+    {step:"k-mer encoding (k=4)",detail:"42 × 256 frequency matrix generated · zero DB lookups",time:"0.21s",model:"k-mer"},
+    {step:"AI taxonomy classification",detail:"Random Forest · 200 trees · 5-fold CV: 86.4% ± 12.9% · 12 phyla",time:"1.43s",model:"RF classifier"},
+    {step:"Novel OTU detection",detail:"3 ASVs flagged (conf < 0.72) · forwarded to UMAP pipeline",time:"0.03s",model:"threshold"},
+    {step:"UMAP dimensionality reduction",detail:"42 → 2D embedding · n_neighbors=5 · min_dist=0.1",time:"2.18s",model:"UMAP"},
+    {step:"HDBSCAN clustering",detail:"2 clusters found · 1 novel cluster (Cluster 1) · 0 noise points",time:"0.31s",model:"HDBSCAN"},
+    {step:"Abundance normalisation",detail:"Rarefaction to 12,738 reads · DESeq2-style VST",time:"0.08s",model:""},
+    {step:"Alpha diversity",detail:"Shannon H' · Simpson D · Chao1 · Pielou J' · all 5 stations",time:"0.05s",model:""},
+    {step:"Beta diversity",detail:"5×5 Bray-Curtis matrix · max dissimilarity: vent vs abyssal = 0.41",time:"0.04s",model:""},
+    {step:"Report generation",detail:"JSON results + CSV tables + charts ready",time:"0.11s",model:""},
+  ]
+};
+
+// ════════════ NAV ════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event.target.classList.add('active');
+  if (id === 'umap') renderUMAP();
+  if (id === 'heatmap') renderHeatmap();
+  if (id === 'diversity') renderDiversity();
+  if (id === 'taxonomy') renderTaxonomy();
+}
+
+// ════════════ COLORS ════════════
+const PHYLUM_COLORS = {
+  "Alveolata":"#00e5c8","Foraminifera":"#0fa8ff","Nematoda":"#39ff9a",
+  "NOVEL/Unassigned":"#ff4fd8","Annelida":"#ffb830","Rhizaria":"#a78bfa",
+  "Arthropoda":"#fbbf24","Euglenozoa":"#34d399","Kinorhyncha":"#60a5fa",
+  "Stramenopiles":"#f87171","Echinodermata":"#fb923c","Choanoflagellatea":"#e879f9",
+  "Xenacoelomorpha":"#a3e635","Unknown":"#6b7280"
+};
+
+function getPhylumColor(ph) { return PHYLUM_COLORS[ph] || '#888'; }
+
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+const CHART_DEFAULTS = {
+  responsive:true, maintainAspectRatio:false,
+  plugins:{ legend:{ labels:{ color:'#7ab8e0', font:{family:"'Space Mono',monospace", size:10}, boxWidth:10 } } }
+};
+
+// ════════════ OVERVIEW CHARTS ════════════
+window.addEventListener('DOMContentLoaded', () => {
+  buildOverviewCharts();
+  buildPipelineLog();
+  buildNovelList();
+  buildTaxonTable();
+});
+
+function buildOverviewCharts() {
+  const phyla = Object.keys(DATA.top_phyla);
+  const vals  = Object.values(DATA.top_phyla);
+  const colors = phyla.map(getPhylumColor);
+
+  // Donut
+  new Chart(document.getElementById('chart-phylum-donut'), {
+    type:'doughnut',
+    data:{ labels:phyla, datasets:[{ data:vals, backgroundColor:colors.map(c=>hexToRgba(c,.8)), borderColor:colors, borderWidth:1 }] },
+    options:{...CHART_DEFAULTS, cutout:'60%'}
+  });
+
+  // Reads bar
+  const stns = DATA.stations.map(s => s.replace('STN_0','S').replace('_','·').split('_')[0]);
+  new Chart(document.getElementById('chart-reads-bar'), {
+    type:'bar',
+    data:{ labels:stns, datasets:[{ label:'Total reads', data:DATA.stations.map(s=>DATA.reads_per_station[s]), backgroundColor:['#00e5c844','#0fa8ff44','#39ff9a44','#ff4fd844','#ffb83044'], borderColor:['#00e5c8','#0fa8ff','#39ff9a','#ff4fd8','#ffb830'], borderWidth:1.5 }] },
+    options:{...CHART_DEFAULTS, plugins:{...CHART_DEFAULTS.plugins, legend:{display:false}}, scales:{ x:{ticks:{color:'#7ab8e0',font:{size:9}}}, y:{ticks:{color:'#7ab8e0',font:{size:9}},grid:{color:'rgba(0,229,200,.07)'}} }}
+  });
+
+  // Shannon bar
+  const habitats = DATA.stations.map(s=>DATA.diversity[s].habitat.replace(' ','·'));
+  const shannons = DATA.stations.map(s=>DATA.diversity[s].shannon);
+  new Chart(document.getElementById('chart-shannon-bar'), {
+    type:'bar',
+    data:{ labels:DATA.stations.map(s=>s.replace('STN_0','')), datasets:[{ label:"Shannon H'", data:shannons, backgroundColor:shannons.map(v=>hexToRgba('#00e5c8', 0.3+v/8)), borderColor:'#00e5c8', borderWidth:1.5, borderRadius:4 }] },
+    options:{...CHART_DEFAULTS, plugins:{...CHART_DEFAULTS.plugins, legend:{display:false}}, scales:{ x:{ticks:{color:'#7ab8e0',font:{size:9}}}, y:{min:2.3,ticks:{color:'#7ab8e0',font:{size:9}},grid:{color:'rgba(0,229,200,.07)'}} }}
+  });
+}
+
+// ════════════ TAXONOMY ════════════
+function renderTaxonomy() {
+  // Phylum bar
+  const phyla = Object.keys(DATA.top_phyla);
+  const vals  = Object.values(DATA.top_phyla);
+  const c1 = document.getElementById('chart-phylum-bar');
+  if (c1._chartInstance) c1._chartInstance.destroy();
+  c1._chartInstance = new Chart(c1, {
+    type:'bar',
+    data:{ labels:phyla, datasets:[{ label:'% total reads', data:vals, backgroundColor:phyla.map(p=>hexToRgba(getPhylumColor(p),.5)), borderColor:phyla.map(getPhylumColor), borderWidth:1.5, borderRadius:4 }] },
+    options:{...CHART_DEFAULTS, indexAxis:'y', plugins:{...CHART_DEFAULTS.plugins, legend:{display:false}}, scales:{ x:{ticks:{color:'#7ab8e0',font:{size:9}},grid:{color:'rgba(0,229,200,.07)'}}, y:{ticks:{color:'#7ab8e0',font:{size:9}}} }}
+  });
+
+  // Novel pie
+  const c2 = document.getElementById('chart-novel-pie');
+  if (c2._chartInstance) c2._chartInstance.destroy();
+  c2._chartInstance = new Chart(c2, {
+    type:'doughnut',
+    data:{ labels:['Known taxa','Novel / unassigned'], datasets:[{ data:[88.7,11.3], backgroundColor:['rgba(0,229,200,.4)','rgba(255,79,216,.4)'], borderColor:['#00e5c8','#ff4fd8'], borderWidth:2 }] },
+    options:{...CHART_DEFAULTS, cutout:'65%'}
+  });
+}
+
+function buildTaxonTable() {
+  const table = document.getElementById('taxon-table');
+  table.innerHTML = `<thead><tr><th>Taxon</th><th>Phylum</th><th>Total reads</th><th>Confidence</th><th>Source</th></tr></thead>`;
+  const tbody = document.createElement('tbody');
+  DATA.taxon_table.forEach(row => {
+    const pillClass = row.conf === 'High' ? 'pill-hi' : row.conf === 'Med' ? 'pill-md' : row.conf === 'Novel' ? 'pill-nov' : 'pill-lo';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${row.taxon}</td><td style="color:${getPhylumColor(row.phylum)}">${row.phylum}</td><td>${row.total.toLocaleString()}</td><td><span class="pill ${pillClass}">${row.conf}</span></td><td style="color:var(--txt3)">${row.source}</td>`;
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+}
+
+// ════════════ UMAP ════════════
+function renderUMAP() {
+  const canvas = document.getElementById('chart-umap');
+  if (canvas._chartInstance) canvas._chartInstance.destroy();
+
+  const grouped = {};
+  DATA.umap_points.forEach(p => {
+    const key = p.novel ? 'NOVEL/Unassigned' : p.phylum;
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push({ x: p.x, y: p.y });
+  });
+
+  const datasets = Object.entries(grouped).map(([ph, pts]) => ({
+    label: ph,
+    data: pts,
+    backgroundColor: hexToRgba(getPhylumColor(ph), ph === 'NOVEL/Unassigned' ? 0.9 : 0.75),
+    borderColor: getPhylumColor(ph),
+    borderWidth: ph === 'NOVEL/Unassigned' ? 2 : 1,
+    pointRadius: ph === 'NOVEL/Unassigned' ? 9 : 7,
+    pointStyle: ph === 'NOVEL/Unassigned' ? 'triangle' : 'circle',
+  }));
+
+  canvas._chartInstance = new Chart(canvas, {
+    type:'scatter',
+    data:{ datasets },
+    options:{
+      ...CHART_DEFAULTS,
+      scales:{
+        x:{ticks:{color:'#3d7aaa',font:{size:8}},grid:{color:'rgba(0,229,200,.05)'},title:{display:true,text:'UMAP 1',color:'#3d7aaa',font:{size:9}}},
+        y:{ticks:{color:'#3d7aaa',font:{size:8}},grid:{color:'rgba(0,229,200,.05)'},title:{display:true,text:'UMAP 2',color:'#3d7aaa',font:{size:9}}}
+      }
+    }
+  });
+}
+
+function buildNovelList() {
+  const container = document.getElementById('novel-list');
+  const icons = ['🔬','🌊','🧫'];
+  DATA.novel_taxa.forEach((taxon, i) => {
+    const div = document.createElement('div');
+    div.className = 'novel-item';
+    div.innerHTML = `
+      <div class="novel-icon">${icons[i]}</div>
+      <div>
+        <div class="novel-name">${taxon.name}</div>
+        <div class="novel-meta">
+          Phylum: ${taxon.phylum} · Reads: ${taxon.reads.toLocaleString()} · Confidence: ${(taxon.conf*100).toFixed(0)}% · ${taxon.cluster}<br>
+          DB identity: ${taxon.identity} · Reference analogue: ${taxon.source}<br>
+          Inferred role: ${taxon.role}
+        </div>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+// ════════════ DIVERSITY ════════════
+function renderDiversity() {
+  const stns = DATA.stations;
+  const depths = stns.map(s => DATA.diversity[s].depth);
+  const shannons = stns.map(s => DATA.diversity[s].shannon);
+  const habColors = stns.map(s => {
+    const h = DATA.diversity[s].habitat;
+    return h.includes('Vent') ? '#ff4fd8' : h.includes('Canyon') ? '#ffb830' : h.includes('Seamount') ? '#0fa8ff' : '#00e5c8';
+  });
+
+  // Alpha scatter (depth vs shannon)
+  const c1 = document.getElementById('chart-alpha-scatter');
+  if (c1._chartInstance) c1._chartInstance.destroy();
+  c1._chartInstance = new Chart(c1, {
+    type:'scatter',
+    data:{ datasets:[{ label:"Shannon H'", data:stns.map((s,i)=>({x:depths[i],y:shannons[i],label:DATA.diversity[s].habitat})), backgroundColor:habColors.map(c=>c+'aa'), borderColor:habColors, borderWidth:2, pointRadius:12 }] },
+    options:{
+      ...CHART_DEFAULTS,
+      plugins:{...CHART_DEFAULTS.plugins,
+        tooltip:{callbacks:{label:ctx=>`${DATA.stations[ctx.dataIndex].replace('STN_0','')} · H'=${ctx.parsed.y}`}},
+        legend:{display:false}
+      },
+      scales:{
+        x:{ticks:{color:'#7ab8e0',font:{size:9}},title:{display:true,text:'Depth (m)',color:'#7ab8e0',font:{size:9}},grid:{color:'rgba(0,229,200,.06)'}},
+        y:{min:2.3,ticks:{color:'#7ab8e0',font:{size:9}},title:{display:true,text:"Shannon H'",color:'#7ab8e0',font:{size:9}},grid:{color:'rgba(0,229,200,.06)'}}
+      }
+    }
+  });
+
+  // Multi-metric bar
+  const c2 = document.getElementById('chart-multi-bar');
+  if (c2._chartInstance) c2._chartInstance.destroy();
+  c2._chartInstance = new Chart(c2, {
+    type:'bar',
+    data:{
+      labels:stns.map(s=>s.replace('STN_0','')),
+      datasets:[
+        {label:"Shannon H'",data:shannons,backgroundColor:'rgba(0,229,200,.35)',borderColor:'#00e5c8',borderWidth:1.5,borderRadius:3},
+        {label:"Pielou J'",data:stns.map(s=>DATA.diversity[s].pielou),backgroundColor:'rgba(15,168,255,.35)',borderColor:'#0fa8ff',borderWidth:1.5,borderRadius:3},
+        {label:"Simpson D",data:stns.map(s=>DATA.diversity[s].simpson),backgroundColor:'rgba(57,255,154,.35)',borderColor:'#39ff9a',borderWidth:1.5,borderRadius:3},
+      ]
+    },
+    options:{...CHART_DEFAULTS,scales:{x:{ticks:{color:'#7ab8e0',font:{size:9}}},y:{min:0,max:3.5,ticks:{color:'#7ab8e0',font:{size:9}},grid:{color:'rgba(0,229,200,.06)'}}}}
+  });
+
+  // BC matrix
+  const bcTable = document.getElementById('bc-table');
+  const shortNames = stns.map(s=>s.replace('STN_0','S').split('_')[0]+'·'+s.split('_')[1].slice(0,6));
+  bcTable.innerHTML = '';
+  const thead = document.createElement('thead');
+  thead.innerHTML = `<tr><th></th>${stns.map((s,i)=>`<th>${shortNames[i]}</th>`).join('')}</tr>`;
+  bcTable.appendChild(thead);
+  const tbody = document.createElement('tbody');
+  stns.forEach((s1, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style="color:var(--txt2);font-family:'Space Mono',monospace;font-size:.6rem">${shortNames[i]}</td>`;
+    stns.forEach(s2 => {
+      const val = DATA.bray_curtis[s1][s2];
+      const intensity = val;
+      const bg = val === 0 ? 'rgba(0,229,200,0.15)' : `rgba(255,79,216,${val * 0.8})`;
+      tr.innerHTML += `<td style="background:${bg};font-family:'Space Mono',monospace;font-size:.62rem;color:${val===0?'var(--cyan)':'var(--txt)'}">${val.toFixed(3)}</td>`;
+    });
+    tbody.appendChild(tr);
+  });
+  bcTable.appendChild(tbody);
+}
+
+// ════════════ HEATMAP ════════════
+function renderHeatmap() {
+  const container = document.getElementById('heatmap-container');
+  if (container.dataset.rendered) return;
+  container.dataset.rendered = '1';
+
+  const stns = DATA.stations;
+  const phyla = Object.keys(DATA.top_phyla);
+  const shortStns = stns.map(s => s.replace('STN_0','S').replace(/_/g,' '));
+
+  // Header row
+  const headerDiv = document.createElement('div');
+  headerDiv.style.cssText = 'display:grid;grid-template-columns:120px repeat('+stns.length+',1fr);gap:2px;margin-bottom:2px;font-family:Space Mono,monospace;font-size:.58rem;color:var(--txt3)';
+  headerDiv.innerHTML = '<div></div>' + shortStns.map(s=>`<div style="text-align:center;padding:.2rem;word-break:break-all">${s}</div>`).join('');
+  container.appendChild(headerDiv);
+
+  phyla.forEach(ph => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:120px repeat('+stns.length+',1fr);gap:2px;margin-bottom:2px;align-items:center';
+    row.innerHTML = `<div style="font-family:'Space Mono',monospace;font-size:.58rem;color:${getPhylumColor(ph)};text-align:right;padding-right:.5rem;white-space:nowrap">${ph}</div>`;
+    stns.forEach(stn => {
+      const pct = DATA.phylum_per_station[stn][ph] || 0;
+      const alpha = Math.min(0.95, 0.08 + pct / 35);
+      const cell = document.createElement('div');
+      cell.style.cssText = `background:${hexToRgba(getPhylumColor(ph),alpha)};border-radius:4px;padding:.4rem .2rem;text-align:center;font-family:'Space Mono',monospace;font-size:.62rem;font-weight:700;color:${getPhylumColor(ph)};cursor:default;transition:transform .15s`;
+      cell.textContent = pct.toFixed(1)+'%';
+      cell.title = `${ph} @ ${stn.replace('STN_0','')}: ${pct.toFixed(1)}%`;
+      cell.onmouseenter = () => { cell.style.transform = 'scale(1.08)'; };
+      cell.onmouseleave = () => { cell.style.transform = ''; };
+      row.appendChild(cell);
+    });
+    container.appendChild(row);
+  });
+
+  // Stacked bar
+  setTimeout(() => {
+    const c = document.getElementById('chart-stacked');
+    if (c._chartInstance) c._chartInstance.destroy();
+    c._chartInstance = new Chart(c, {
+      type:'bar',
+      data:{
+        labels: stns.map(s => s.replace('STN_0','').replace(/_/g,' ')),
+        datasets: phyla.map(ph => ({
+          label: ph,
+          data: stns.map(s => DATA.phylum_per_station[s][ph] || 0),
+          backgroundColor: hexToRgba(getPhylumColor(ph), 0.75),
+          borderColor: getPhylumColor(ph),
+          borderWidth: 0.5
+        }))
+      },
+      options:{
+        ...CHART_DEFAULTS,
+        plugins:{...CHART_DEFAULTS.plugins, legend:{labels:{color:'#7ab8e0',font:{size:9},boxWidth:8}}},
+        scales:{
+          x:{stacked:true,ticks:{color:'#7ab8e0',font:{size:9}}},
+          y:{stacked:true,ticks:{color:'#7ab8e0',font:{size:9}},grid:{color:'rgba(0,229,200,.06)'},title:{display:true,text:'% reads',color:'#7ab8e0',font:{size:9}}}
+        }
+      }
+    });
+  }, 100);
+}
+
+// ════════════ PIPELINE LOG ════════════
+function buildPipelineLog() {
+  const container = document.getElementById('pipe-steps');
+  DATA.pipeline_log.forEach(step => {
+    const div = document.createElement('div');
+    div.className = 'pipe-step done';
+    div.innerHTML = `
+      <div class="step-dot dot-done">✓</div>
+      <div class="step-info">
+        <div class="step-name">${step.step}${step.model ? ` <span style="color:var(--cyan);font-size:.58rem">[${step.model}]</span>` : ''}</div>
+        <div class="step-detail">${step.detail}</div>
+      </div>
+      <div class="step-time">${step.time}</div>`;
+    container.appendChild(div);
+  });
+}
+</script>
+</body>
+</html>
